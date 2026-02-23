@@ -21,6 +21,7 @@ android {
     namespace = "com.zionhuang.music"
     compileSdk = 35
     buildToolsVersion = "35.0.0"
+
     defaultConfig {
         applicationId = "com.zionhuang.music"
         minSdk = 24
@@ -29,6 +30,7 @@ android {
         versionName = "0.5.10"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -40,6 +42,7 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
+
     flavorDimensions += "version"
     productFlavors {
         create("full") {
@@ -50,52 +53,50 @@ android {
         }
     }
 
-//    splits {
-//        abi {
-//            isEnable = true
-//            reset()
-//            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-//            isUniversalApk = false
-//        }
-//    }
-    
     signingConfigs {
         getByName("debug") {
             if (System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD") != null) {
-                storeFile = file(System.getenv("MUSIC_DEBUG_KEYSTORE_FILE"))
+                storeFile = file(System.getenv("MUSIC_DEBUG_KEYSTORE_FILE")!!)
                 storePassword = System.getenv("MUSIC_DEBUG_SIGNING_STORE_PASSWORD")
                 keyAlias = "debug"
                 keyPassword = System.getenv("MUSIC_DEBUG_SIGNING_KEY_PASSWORD")
             }
         }
     }
+
     buildFeatures {
         buildConfig = true
         compose = true
     }
+
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
+        // Forzamos compatibilidad con Java 17 para evitar errores en GitHub Actions
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    // Configuración moderna de Kotlin para evitar conflictos de JVM Target
     kotlin {
         jvmToolchain(17)
     }
-    kotlinOptions {
-        freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
-        jvmTarget = "17"
+
+    // Reemplazamos kotlinOptions (obsoleto) por compilerOptions
+    compilerOptions {
+        freeCompilerArgs.add("-Xcontext-receivers")
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
+
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.isReturnDefaultValues = true
     }
-    // avoid DEPENDENCY_INFO_BLOCK for IzzyOnDroid
+
     dependenciesInfo {
-        // Disables dependency metadata when building APKs.
         includeInApk = false
-        // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
     }
+
     lint {
         lintConfig = file("app/lint.xml")
     }
@@ -133,7 +134,6 @@ dependencies {
     implementation(libs.squigglyslider)
 
     implementation(libs.coil)
-
     implementation(libs.shimmer)
 
     implementation(libs.media3)
